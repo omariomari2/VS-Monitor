@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quantro Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              bgPrimary: '#EAEAEA', // Slightly darker off-white for main bg
+              bgCard: '#FFFFFF',
+              textPrimary: '#111827',
+              textSecondary: '#6B7280', // Gray-500
+              textTertiary: '#9CA3AF', // Gray-400
+              accentGreen: '#4ADE80', // Green-400
+              accentGreenLight: '#DCFCE7', // Green-100
+              chartDark: '#1F2937', // Gray-800
+              chartGray: '#E5E7EB', // Gray-200
+            },
+            boxShadow: {
+              'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #EAEAEA;
+        color: #111827;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "framer-motion": "https://esm.sh/framer-motion@^12.29.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
