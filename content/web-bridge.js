@@ -15,17 +15,21 @@
     const { type, payload } = event.data;
 
     if (type === "BOOK_APPT") {
-      chrome.runtime.sendMessage({
-        event: "bookFromWeb",
-        payload: payload || {},
-      });
-
-      window.postMessage(
+      chrome.runtime.sendMessage(
         {
-          source: "ged-ext",
-          type: "BOOK_APPT_ACK",
+          event: "bookFromWeb",
+          payload: payload || {},
         },
-        "*"
+        (response) => {
+          window.postMessage(
+            {
+              source: "ged-ext",
+              type: "BOOK_APPT_ACK",
+              payload: response || {},
+            },
+            "*"
+          );
+        }
       );
       return;
     }

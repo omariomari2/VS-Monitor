@@ -23,8 +23,8 @@ chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
 			handleOnStart(prefs);
 			break;
 		case "bookFromWeb":
-			handleBookFromWeb(payload);
-			break;
+			handleBookFromWeb(payload, sendResponse);
+			return true;
 		case "webStart":
 			handleOnStart(prefs || payload || {});
 			break;
@@ -138,8 +138,8 @@ const replyWithStatus = (sendResponse) => {
 	);
 };
 
-const handleBookFromWeb = (payload = {}) => {
-	const { locationId, locationName, slotTimestamp, slotDisplay, tzData } =
+const handleBookFromWeb = (payload = {}, sendResponse) => {
+	const { locationId, locationName, slotTimestamp, slotDisplay, tzData, selector } =
 		payload;
 	chrome.storage.local.set({
 		pendingSlot: {
@@ -149,12 +149,14 @@ const handleBookFromWeb = (payload = {}) => {
 			slotDisplay,
 			tzData,
 		},
+		bookingTarget: {
+			locationId: locationId || "",
+			locationName: locationName || "",
+			selector: selector || "",
+		},
 	});
 
-	chrome.notifications.create({
-		title: "Global Entry Drops",
-		message: "Selection saved. Click the extension icon to continue.",
-		iconUrl: "images/icon-48.png",
-		type: "basic",
-	});
+	if (sendResponse) {
+		sendResponse({ ok: true });
+	}
 };

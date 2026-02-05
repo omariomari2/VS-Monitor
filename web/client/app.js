@@ -35,6 +35,8 @@ const state = {
   manualRefreshToken: 0,
   syncingFromExtension: false,
   extStatusReceived: false,
+  bookingWindow: null,
+  pendingBookingUrl: "",
 };
 
 const getLocalISODate = () => {
@@ -92,11 +94,22 @@ const setNotice = (message, variant = "") => {
 };
 
 const sendBookingToExtension = (payload) => {
+  const bookingUrl =
+    "https://ttp.cbp.dhs.gov/schedulerui/schedule-interview/location?lang=en&vo=true&returnUrl=ttp-external&service=up";
+  state.bookingWindow = window.open("about:blank", "_blank");
+  if (!state.bookingWindow) {
+    setNotice(
+      "Popup blocked. Allow popups so we can open the booking page.",
+      "alert"
+    );
+  }
+
   sendExtensionMessage("BOOK_APPT", payload);
   setNotice(
-    "Selection sent. Click the extension icon to continue.",
+    "Selection sent. Waiting for the extension to confirm.",
     "success"
   );
+  state.pendingBookingUrl = bookingUrl;
 };
 
 const setStatus = (running) => {
@@ -609,16 +622,31 @@ window.addEventListener("message", (event) => {
     return;
   }
   const data = event.data || {};
-  if (data.source !== "ged-ext" || data.type !== "EXT_STATUS") {
+  if (data.source !== "ged-ext") {
     return;
   }
-  state.extStatusReceived = true;
-  const payload = data.payload || {};
-  const prefs = payload.prefs || {};
-  if (payload.isRunning) {
-    startMonitoringFromExtension(prefs);
-  } else {
-    stopMonitoringFromExtension();
+  if (data.type === "EXT_STATUS") {
+    state.extStatusReceived = true;
+    const payload = data.payload || {};
+    const prefs = payload.prefs || {};
+    if (payload.isRunning) {
+      startMonitoringFromExtension(prefs);
+    } else {
+      stopMonitoringFromExtension();
+    }
+    return;
+  }
+
+  if (data.type === "BOOK_APPT_ACK") {
+    if (state.pendingBookingUrl) {
+      if (state.bookingWindow && !state.bookingWindow.closed) {
+        state.bookingWindow.location = state.pendingBookingUrl;
+      } else {
+        window.open(state.pendingBookingUrl, "_blank");
+      }
+      state.pendingBookingUrl = "";
+      setNotice("Opening the booking page now.", "success");
+    }
   }
 });
 

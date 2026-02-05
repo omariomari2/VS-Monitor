@@ -17,8 +17,6 @@ const stoppedSpan = document.getElementById("stoppedSpan");
 const locationIdError = document.getElementById("locationIdError");
 const startDateError = document.getElementById("startDateError");
 const endDateError = document.getElementById("endDateError");
-const BOOKING_URL =
-	"https://ttp.cbp.dhs.gov/schedulerui/schedule-interview/location?lang=en&vo=true&returnUrl=ttp-external&service=up";
 
 const hideElement = (elem) => {
 	elem.style.display = "none";
@@ -232,14 +230,6 @@ chrome.storage.local.get(
 				selectedSlotElement.value = slotTimestamp;
 			}
 
-			chrome.storage.local.set({
-				bookingTarget: {
-					locationId: pendingLocationId || "",
-					locationName: pendingLocationName || "",
-				},
-			});
-
-			chrome.tabs.create({ url: BOOKING_URL });
 			chrome.storage.local.remove("pendingSlot");
 		} else {
 			selectedSlotElement.value = "";
