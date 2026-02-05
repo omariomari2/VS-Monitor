@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Entry Drops | Live Slot Monitor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Work+Sans:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-api-base="http://localhost:4000">
+  <div class="page">
+    <header class="hero">
+      <div class="hero-content">
+        <div class="badge">Live Global Entry Slots</div>
+        <h1>Global Entry Drops</h1>
+        <p>
+          Monitor interview availability in real time, see every open slot, and
+          track changes without living in a browser tab.
+        </p>
+        <div class="hero-actions">
+          <button class="btn primary" id="startButton">Start Monitoring</button>
+          <button class="btn ghost" id="stopButton">Stop</button>
+        </div>
+        <div class="status-row">
+          <span class="status-pill" id="statusPill">Stopped</span>
+          <span class="status-text" id="statusText">Not monitoring</span>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="card-title">Next Best Slot</div>
+        <div class="card-value" id="earliestSlot">Select a location to begin</div>
+        <div class="card-meta" id="earliestMeta">No slots loaded yet</div>
+        <div class="divider"></div>
+        <div class="meta-grid">
+          <div>
+            <div class="meta-label">Last Checked</div>
+            <div class="meta-value" id="lastChecked">--</div>
+          </div>
+          <div>
+            <div class="meta-label">Open Slots</div>
+            <div class="meta-value" id="slotCount">0</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Monitor Settings</h2>
+            <p>Pick a location and the date range you want to watch.</p>
+          </div>
+          <div class="panel-actions">
+            <button class="btn subtle" id="refreshButton">Refresh Now</button>
+            <button class="btn subtle" id="clearButton">Clear Slots</button>
+          </div>
+        </div>
+
+        <form class="form-grid" id="monitorForm">
+          <label class="field">
+            <span>Enrollment Location</span>
+            <select id="locationSelect">
+              <option value="">Select a location</option>
+            </select>
+            <span class="field-error" id="locationError">Please select a valid location.</span>
+          </label>
+
+          <label class="field">
+            <span>Start Date</span>
+            <input type="date" id="startDate" />
+            <span class="field-error" id="startDateError">Please enter a valid start date.</span>
+          </label>
+
+          <label class="field">
+            <span>End Date</span>
+            <input type="date" id="endDate" />
+            <span class="field-error" id="endDateError">Please enter a valid end date.</span>
+          </label>
+
+          <div class="field info">
+            <span>Selected Location Timezone</span>
+            <div class="info-card" id="tzInfo">--</div>
+          </div>
+        </form>
+
+        <div class="notice" id="statusNotice">Ready when you are.</div>
+      </section>
+
+      <section class="panel slots-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Available Slots</h2>
+            <p id="slotsSummary">No slots loaded yet.</p>
+          </div>
+        </div>
+
+        <div class="slot-table-wrapper">
+          <table class="slot-table">
+            <thead>
+              <tr>
+                <th>Slot Time</th>
+                <th>Local Time</th>
+                <th>Book</th>
+              </tr>
+            </thead>
+            <tbody id="slotTableBody">
+              <tr id="slotEmptyRow">
+                <td class="slot-empty" colspan="4">
+                  Choose your settings and click Start Monitoring.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

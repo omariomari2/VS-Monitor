@@ -16,7 +16,30 @@
         "service_worker": "background.js",
         "type": "module"
     },
+    "host_permissions": [
+        "https://ttp.cbp.dhs.gov/*",
+        "http://localhost:5500/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "http://localhost:5500/*"
+            ],
+            "js": [
+                "content/web-bridge.js"
+            ]
+        },
+        {
+            "matches": [
+                "https://ttp.cbp.dhs.gov/schedulerui/schedule-interview/location*"
+            ],
+            "js": [
+                "content/booking-auto.js"
+            ]
+        }
+    ],
     "permissions": [
+        "tabs",
         "storage",
         "alarms",
         "notifications"

@@ -2,10 +2,12 @@
 const locationIdElement = document.getElementById("locationId");
 const startDateElement = document.getElementById("startDate");
 const endDateElement = document.getElementById("endDate");
+const selectedSlotElement = document.getElementById("selectedSlot");
 
 // Button elements
 const startButton = document.getElementById("startButton");
 const stopButton = document.getElementById("stopButton");
+const overviewButton = document.getElementById("overviewButton");
 
 // Span listeners
 const runningSpan = document.getElementById("runningSpan");
@@ -15,6 +17,8 @@ const stoppedSpan = document.getElementById("stoppedSpan");
 const locationIdError = document.getElementById("locationIdError");
 const startDateError = document.getElementById("startDateError");
 const endDateError = document.getElementById("endDateError");
+const BOOKING_URL =
+	"https://ttp.cbp.dhs.gov/schedulerui/schedule-interview/location?lang=en&vo=true&returnUrl=ttp-external&service=up";
 
 const hideElement = (elem) => {
 	elem.style.display = "none";
@@ -30,6 +34,24 @@ const disableElement = (elem) => {
 
 const enableElement = (elem) => {
 	elem.disabled = false;
+};
+
+const formatDateInput = (date) => {
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	const day = String(date.getDate()).padStart(2, "0");
+	return `${date.getFullYear()}-${month}-${day}`;
+};
+
+const addDaysToDateString = (dateString, days) => {
+	if (!dateString) {
+		return "";
+	}
+	const [year, month, day] = dateString.split("-").map(Number);
+	if (!year || !month || !day) {
+		return "";
+	}
+	const date = new Date(year, month - 1, day + days);
+	return formatDateInput(date);
 };
 
 const handleOnStartState = () => {
@@ -141,10 +163,36 @@ stopButton.onclick = () => {
 	chrome.runtime.sendMessage({ event: "onStop" });
 };
 
+overviewButton.onclick = () => {
+	const webAppUrl = "http://localhost:5500";
+	chrome.tabs.query({}, (tabs) => {
+		const existingTab = tabs.find((tab) =>
+			tab.url && tab.url.startsWith(webAppUrl)
+		);
+		if (existingTab && existingTab.id) {
+			chrome.tabs.update(existingTab.id, { active: true, url: webAppUrl });
+			if (existingTab.windowId) {
+				chrome.windows.update(existingTab.windowId, { focused: true });
+			}
+			return;
+		}
+
+		chrome.tabs.create({ url: webAppUrl });
+	});
+};
+
 chrome.storage.local.get(
-	["locationId", "startDate", "endDate", "locations", "isRunning"],
+	[
+		"locationId",
+		"startDate",
+		"endDate",
+		"locations",
+		"isRunning",
+		"pendingSlot",
+	],
 	(result) => {
-		const { locationId, startDate, endDate, locations, isRunning } = result;
+		const { locationId, startDate, endDate, locations, isRunning, pendingSlot } =
+			result;
 
 		setLocations(locations);
 
@@ -158,6 +206,43 @@ chrome.storage.local.get(
 
 		if (endDate) {
 			endDateElement.value = endDate;
+		}
+
+		if (pendingSlot) {
+			const {
+				locationId: pendingLocationId,
+				slotTimestamp,
+				slotDisplay,
+				locationName: pendingLocationName,
+			} = pendingSlot;
+
+			if (pendingLocationId) {
+				locationIdElement.value = pendingLocationId;
+			}
+
+			if (slotTimestamp && slotTimestamp.length >= 10) {
+				const slotDate = slotTimestamp.slice(0, 10);
+				startDateElement.value = slotDate;
+				endDateElement.value = addDaysToDateString(slotDate, 1);
+			}
+
+			if (slotDisplay) {
+				selectedSlotElement.value = slotDisplay;
+			} else if (slotTimestamp) {
+				selectedSlotElement.value = slotTimestamp;
+			}
+
+			chrome.storage.local.set({
+				bookingTarget: {
+					locationId: pendingLocationId || "",
+					locationName: pendingLocationName || "",
+				},
+			});
+
+			chrome.tabs.create({ url: BOOKING_URL });
+			chrome.storage.local.remove("pendingSlot");
+		} else {
+			selectedSlotElement.value = "";
 		}
 
 		if (isRunning) {
