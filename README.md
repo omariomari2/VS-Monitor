@@ -1,4 +1,4 @@
-# Global Entry Drops
+# Visa Slot Monitor
 
 A Chrome Extension that monitors the U.S. Customs and Border Protection (CBP) Trusted Traveler Program API for open Global Entry interview appointment slots. It polls for availability every 60 seconds and sends desktop notifications when new slots are found.
 
